@@ -1,0 +1,39 @@
+======================================================================
+TasAnchor 项目 - 数据提取报告
+======================================================================
+生成时间: 2025-11-22 16:01:46
+项目目录: D:\BaiduSyncdisk\大学学习文件\iGEM\iGEM二面\TasAnchor_Modeling
+
+数据文件列表:
+----------------------------------------------------------------------
+  ✓ data/raw/module_3.1_growth_curves.csv
+  ✓ data/raw/module_3.1_fluorescence.csv
+  ✓ data/raw/module_3.2_biofilm.csv
+  ✓ data/raw/module_3.2_adsorption_9mg.csv
+  ✓ data/raw/module_3.2_adsorption_5mg.csv
+  ✓ data/raw/module_3.3_experimental_conditions.csv
+  ✓ data/raw/module_3.4_verification.csv
+
+数据汇总:
+----------------------------------------------------------------------
+          Module               Data_Type  Data_Points                             File_Saved
+     3.1 Sensing           Growth curves           11           module_3.1_growth_curves.csv
+     3.1 Sensing            Fluorescence            7            module_3.1_fluorescence.csv
+  3.2 Adsorption                 Biofilm            4                 module_3.2_biofilm.csv
+  3.2 Adsorption           Ads-Des (9mg)            6          module_3.2_adsorption_9mg.csv
+  3.2 Adsorption           Ads-Des (5mg)            6          module_3.2_adsorption_5mg.csv
+     3.3 Complex Experimental conditions            1 module_3.3_experimental_conditions.csv
+3.4 Verification   Efficiency comparison            2            module_3.4_verification.csv
+
+重要提示:
+----------------------------------------------------------------------
+1. 当前数据为示例值，需要从 SCU-China Results 页面提取真实数据
+2. 推荐使用 WebPlotDigitizer (https://automeris.io/WebPlotDigitizer/)
+3. 提取数据时注意单位换算和误差范围
+4. 完成数据替换后，重新运行本脚本验证
+
+下一步操作:
+----------------------------------------------------------------------
+1. 运行建模脚本: python code/02_module_3.1.py
+2. 依次完成其他模块的建模分析
+3. 生成最终报告和可视化结果

@@ -1,0 +1,2 @@
+experiment,plasmid,substrate,incubation_time_h,Cd_concentration_mM,induction_time_h,observation
+Sensing-Adhesion Module,pHT01-p43-epcadR-mcherry-p43-tasA-mfp5,Polystyrene microspheres,30,2,16,Red fluorescence under microscope

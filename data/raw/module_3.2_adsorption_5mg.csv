@@ -1,0 +1,7 @@
+cycle_step,cycle_number,process_type,Cd_remaining_mg_L,Cd_initial_mg_L,removal_efficiency_%
+Ads1,1,Adsorption,3.2,5.0,36.0
+Des1,1,Desorption,0.0,5.0,100.0
+Ads2,2,Adsorption,2.5,5.0,50.0
+Des2,2,Desorption,0.0,5.0,100.0
+Ads3,3,Adsorption,1.8,5.0,64.0
+Des3,3,Desorption,0.0,5.0,100.0
