@@ -150,6 +150,47 @@ def hill_equation_simple(x, F_max, EC50, n):
 
 # 拟合Hill方程
 print("\n[3] 拟合简化Hill方程...")
+
+# 从荧光数据中提取用于Hill拟合的数据
+# 假设我们使用25h的峰值荧光
+time_point_h = 25.0
+
+# 找到最接近25h的时间索引
+peak_index = (df_fluo['time_h'] - time_point_h).abs().idxmin()
+peak_time = df_fluo.loc[peak_index, 'time_h']
+print(f"\n[!] 提取 {peak_time}h 的荧光数据用于Hill拟合...")
+
+concentrations = []
+fluorescence = []
+
+for col in df_fluo.columns:
+    if col.startswith('FL_'):
+        # 提取浓度，例如 'FL_1mM' -> 1.0
+        conc_str = col.replace('FL_', '').replace('mM', '')
+        try:
+            conc_val = float(conc_str)
+        except ValueError:
+            print(f"跳过无效列: {col}")
+            continue
+
+        # 提取该浓度下的峰值荧光
+        fl_val = df_fluo.loc[peak_index, col]
+
+        concentrations.append(conc_val)
+        fluorescence.append(fl_val)
+
+# 转换为numpy数组
+concentrations = np.array(concentrations)
+fluorescence = np.array(fluorescence)
+
+print("用于Hill拟合的数据点:")
+for c, f in zip(concentrations, fluorescence):
+    print(f"  {c} mM -> {f} FU")
+# -------------------
+# BUG修复 - 添加结束
+# -------------------
+
+p0_hill = [max(fluorescence), 1.0, 2.0]  # 三参数
 p0_hill = [max(fluorescence), 1.0, 2.0]  # 三参数
 
 try:
