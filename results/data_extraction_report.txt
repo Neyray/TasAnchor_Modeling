@@ -1,7 +1,7 @@
 ======================================================================
 TasAnchor 项目 - 数据提取报告
 ======================================================================
-生成时间: 2025-11-22 22:12:45
+生成时间: 2025-11-23 19:09:48
 项目目录: D:\BaiduSyncdisk\大学学习文件\iGEM\iGEM二面\TasAnchor_Modeling
 
 数据文件列表:
@@ -17,9 +17,9 @@ TasAnchor 项目 - 数据提取报告
 数据汇总:
 ----------------------------------------------------------------------
           Module               Data_Type  Data_Points                             File_Saved
-     3.1 Sensing           Growth curves           11           module_3.1_growth_curves.csv
-     3.1 Sensing            Fluorescence            7            module_3.1_fluorescence.csv
-  3.2 Adsorption                 Biofilm            4                 module_3.2_biofilm.csv
+     3.1 Sensing           Growth curves            4           module_3.1_growth_curves.csv
+     3.1 Sensing            Fluorescence            6            module_3.1_fluorescence.csv
+  3.2 Adsorption                 Biofilm            5                 module_3.2_biofilm.csv
   3.2 Adsorption           Ads-Des (9mg)            6          module_3.2_adsorption_9mg.csv
   3.2 Adsorption           Ads-Des (5mg)            6          module_3.2_adsorption_5mg.csv
      3.3 Complex Experimental conditions            1 module_3.3_experimental_conditions.csv

@@ -1,3 +1,3 @@
 group,strain_type,adsorption_efficiency_%,std_%,Cd_initial_mg_L,incubation_time_h
-Control (ΔtasAΔsinR),Knockout only,15.2,3.5,9.0,15
-Experimental (tasA-smtA),With adsorption module,42.8,4.2,9.0,15
+Control (ΔtasAΔsinR),Knockout only,13.917,3.5,9.0,15
+Experimental (tasA-smtA),With adsorption module,28.904,4.2,9.0,15
