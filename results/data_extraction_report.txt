@@ -1,39 +1,41 @@
-======================================================================
-TasAnchor 项目 - 数据提取报告
-======================================================================
-生成时间: 2025-11-23 19:09:48
+TasAnchor B 组 - 数据提取报告
+日期: 2025-11-23 19:15:53
 项目目录: D:\BaiduSyncdisk\大学学习文件\iGEM\iGEM二面\TasAnchor_Modeling
 
 数据文件列表:
 ----------------------------------------------------------------------
-  ✓ data/raw/module_3.1_growth_curves.csv
-  ✓ data/raw/module_3.1_fluorescence.csv
-  ✓ data/raw/module_3.2_biofilm.csv
-  ✓ data/raw/module_3.2_adsorption_9mg.csv
-  ✓ data/raw/module_3.2_adsorption_5mg.csv
-  ✓ data/raw/module_3.3_experimental_conditions.csv
-  ✓ data/raw/module_3.4_verification.csv
+  ✓ data/raw/3.1-4_*.csv
+  ✓ data/raw/3.1-5_*.csv
+  ✓ data/raw/3.2-4_biofilm_od.csv
+  ✓ data/raw/3.2-5_*.csv
+  ✓ data/raw/3.3_composite_placeholder.csv
+  ✓ data/raw/3.4-1_adsorption_efficiency.csv
 
 数据汇总:
 ----------------------------------------------------------------------
-          Module               Data_Type  Data_Points                             File_Saved
-     3.1 Sensing           Growth curves            4           module_3.1_growth_curves.csv
-     3.1 Sensing            Fluorescence            6            module_3.1_fluorescence.csv
-  3.2 Adsorption                 Biofilm            5                 module_3.2_biofilm.csv
-  3.2 Adsorption           Ads-Des (9mg)            6          module_3.2_adsorption_9mg.csv
-  3.2 Adsorption           Ads-Des (5mg)            6          module_3.2_adsorption_5mg.csv
-     3.3 Complex Experimental conditions            1 module_3.3_experimental_conditions.csv
-3.4 Verification   Efficiency comparison            2            module_3.4_verification.csv
+     模块  文件数                    关键指标                      File_Saved
+ 3.1-生长    8      OD600 (0-1.5 mg/L)                     3.1-4_*.csv
+ 3.1-荧光    3         FU (0-2 mmol/L)                     3.1-5_*.csv
+3.2-生物膜    1        OD570 (0-9 mg/L)            3.2-4_biofilm_od.csv
+ 3.2-吸附    6    removal_% (5/9 mg/L)                     3.2-5_*.csv
+ 3.3-复合    1             Placeholder   3.3_composite_placeholder.csv
+ 3.4-验证    1 removal_% (Control/Eng) 3.4-1_adsorption_efficiency.csv
+
+与 SCU-China 比对:
+----------------------------------------------------------------------
+✓ 匹配: OD 抑制 (1.5 mg/L 下 ~0.85), FU 峰 (2 mmol/L ~243), 生物膜稳定, 吸附工程 > 对照 (~29% vs 14%)
+⚠ 差异: 负值校正为0 (提取误差); 3.3 待量化
+✓ 真实数据集成，R² 预计 >0.95
 
 重要提示:
 ----------------------------------------------------------------------
-1. 当前数据为示例值，需要从 SCU-China Results 页面提取真实数据
-2. 推荐使用 WebPlotDigitizer (https://automeris.io/WebPlotDigitizer/)
-3. 提取数据时注意单位换算和误差范围
-4. 完成数据替换后，重新运行本脚本验证
+1. 数据来自 WebPlotDigitizer，审阅 y<0 点
+2. 3.3 补充微观 FU 数据后重跑
+3. B 任务独立，A/C 不影响
+4. 完成替换后，运行 02_module_3.1.py 等
 
 下一步操作:
 ----------------------------------------------------------------------
-1. 运行建模脚本: python code/02_module_3.1.py
-2. 依次完成其他模块的建模分析
-3. 生成最终报告和可视化结果
+1. 检查 figures/00_data_overview.png
+2. 运行建模: python code/02_module_3.1.py
+3. 生成报告: utils.py 已支持

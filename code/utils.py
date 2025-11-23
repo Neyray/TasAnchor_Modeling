@@ -15,6 +15,9 @@ import matplotlib.pyplot as plt
 from scipy import stats
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 import os
+import matplotlib.pyplot as plt
+plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei']
+plt.rcParams['axes.unicode_minus'] = False
 
 # ============================================================================
 # 数据加载函数
