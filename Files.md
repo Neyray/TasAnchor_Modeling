@@ -904,6 +904,7 @@ Notebooks 文件夹用于快速验证模型、调整初始参数 $p0$ 和进行�
 | `06_module_3.4_verification_ttest.png` | `04_module_3.3_3.4.py` | 模块 3.4 验证实验结果，柱状图及显著性标记。 |
 | `07_module_3.4_sensitivity_mu0.png` | `04_module_3.3_3.4.py` | $\mu_0$ 扰动下的模型敏感性分析图。 |
 | `08_module_3.4_sensitivity_MIC.png` | `04_module_3.3_3.4.py` | $MIC$ 扰动下的模型敏感性分析图。 |
+| `09_module_3.3_composite_time_series.png` | `04_module_3.3_3.4.py` | 模块 3.3 复合功能时序图，对比游离菌与固定化菌的 Cd 移除和 FU 响应。 |
 
 ### 📝 results/ (建模结果文件)
 
