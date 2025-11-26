@@ -1,6 +1,3 @@
-## 📝 完整版 `README.md`
-
-````markdown
 # 🔱 TasAnchor项目 - 功能测试模块数学建模与分析
 
 ## 📄 项目简介 (Project Overview)
