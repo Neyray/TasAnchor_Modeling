@@ -656,9 +656,302 @@ R2: 0.9876
 - μ_max: 0.3-0.5（微生物典型值）
 - lag: 目测数据起始上升的时间点
 
+
+
+-----
+
+## 📁 文件功能详细说明 (续)
+
+### 3\. `code/03_module_3.2.py` - 吸附模块建模
+
+**文件类型**: 核心建模脚本 (Python)  
+**行数**: \~380行  
+**运行时间**: \~10秒  
+**输出**: 3张图 + 3个CSV + 1份报告
+
+#### 功能概述
+
+此脚本是\*\*B任务（功能测试）\*\*的核心建模文件，针对 **TasA-SmtA** 融合蛋白的镉离子吸附功能进行定量分析。它执行以下任务：
+
+1.  **吸附等温线建模**: 拟合 Langmuir 和 Freundlich 模型，确定最大吸附容量 ($q_{max}$) 和吸附亲和力 ($K_L$ 或 $1/n$)。
+2.  **吸附循环分析**: 评估菌株在多轮吸附-解吸过程中的性能衰减，验证其工业应用潜力。
+3.  **二级生长模型**: 建立 $\mu_{max}$ 与 Cd$^{2+}$ 浓度的定量关系，连接模块 3.1 和 3.2 的模型结果。
+
+#### 核心算法与模型
+
+##### A. Langmuir & Freundlich 等温线模型
+
+用于描述平衡浓度 ($C_e$) 与平衡吸附量 ($q_e$) 之间的关系。
+
+| 模型 | 数学公式 (LaTeX) | 物理意义 |
+| :--- | :--- | :--- |
+| **Langmuir** | $$q_e = \frac{q_{\max} \cdot K_L \cdot C_e}{1 + K_L \cdot C_e}$$ | 假设**单层吸附**，位点均匀。|
+| **Freundlich** | $$q_e = K_F \cdot C_e^{1/n}$$ | 假设**多层吸附**，表面不均匀。|
+
+**吸附量计算核心代码 (Langmuir 拟合)**
+
+```python
+# 1. 计算平衡吸附量 qe
+def calculate_qe(C0, removal_percent, V=1.0, m=1.0):
+    Ce = C0 * (1 - removal_percent / 100)
+    return (C0 - Ce) * V / m
+
+# 2. 定义模型函数
+def langmuir_model(Ce, q_max, K_L):
+    return q_max * K_L * Ce / (1 + K_L * Ce)
+
+# 3. 拟合
+popt_lang, _ = curve_fit(langmuir_model, Ce_values, qe_values, p0=[5, 1])
+metrics_lang = calculate_model_metrics(qe_values, langmuir_model(Ce_values, *popt_lang))
+```
+
+##### B. 二级生长模型 (幂函数抑制, Power Law Inhibition)
+
+利用模块 3.1 得到的不同 Cd$^{2+}$ 浓度下的 $\mu_{max}$ 离散点进行拟合。
+
+**数学公式**:
+$$\mu_{\max}(Cd) = \mu_0 \cdot \left[1 - \left(\frac{Cd}{MIC}\right)^n\right]$$
+
+**模型拟合代码**
+
+```python
+# 1. 加载 3.1 模块的参数
+df_gompertz = load_data('module_3.1_gompertz_parameters.csv', folder='results')
+cd_conc = df_gompertz['Cd_concentration_mg_L'].values
+mu_max_values = df_gompertz['mu_max_h-1'].values
+
+# 2. 定义二级模型
+def secondary_growth_model(Cd, mu0, MIC, n):
+    return mu0 * (1 - (Cd / MIC)**n)
+
+# 3. 拟合
+popt_sec, _ = curve_fit(secondary_growth_model, cd_conc, mu_max_values, p0=[0.16, 4.0, 2.0])
+```
+
+#### 输入与输出
+
+**输入**:
+
+  - `results/module_3.1_gompertz_parameters.csv` (**核心依赖**，提供 $\mu_{max}$ 数据)
+  - `data/raw/3.2-5_9mg_pht01.csv`, `3.2-5_9mg_control.csv` 等 (吸附实验数据)
+
+**输出**:
+
+```
+figures/
+├── 03_module_3.2_adsorption_isotherm.png      # Langmuir & Freundlich 拟合对比图
+├── 04_module_3.2_adsorption_cycles.png        # 菌株吸附-解吸循环性能图
+└── 05_module_3.2_secondary_growth_model.png   # μ_max vs Cd²⁺ 抑制曲线
+
+results/
+├── module_3.2_isotherm_parameters.csv         # Langmuir/Freundlich 参数 (q_max, K_L/K_F, R²)
+├── module_3.2_secondary_model_parameters.csv  # 二级生长模型参数 (μ₀, MIC, n, R²)
+└── module_3.2_report.txt                      # 文本总结报告
+```
+
+### 4\. `code/04_module_3.3_3.4.py` - 综合分析与验证
+
+**文件类型**: 综合分析与验证脚本 (Python)  
+**行数**: \~300行  
+**运行时间**: \~5秒  
+**输出**: 3张图 + 2个CSV + 1份总结报告
+
+#### 功能概述
+
+此脚本标志着 **B任务** 的完成，用于项目的**收尾和验证**。它整合了所有模块的结果，并执行关键的统计和预测任务：
+
+1.  **模块 3.4 统计验证**: 使用 t-检验验证工程菌（TasA-SmtA）的吸附效率是否**显著**高于对照组。
+2.  **敏感性分析**: 测试二级生长模型对关键参数（如 $\mu_0, MIC$）变化的鲁棒性。
+3.  **应用场景预测**: 估算处理特定污染所需的菌株用量（基于 $q_{max}$）。
+4.  **生成最终报告**: 汇总项目所有建模结果。
+
+#### 核心算法与分析
+
+##### A. 模块 3.4 统计验证 (t-检验)
+
+用于判断两种菌株（实验组 vs 对照组）的吸附效率差异是否具有统计学意义。
+
+**t-检验核心代码**
+
+```python
+# 1. 加载验证实验数据
+df_verification = load_data('module_3.4_verification.csv')
+control_data = df_verification[df_verification['group'] == 'Control']['adsorption_efficiency_%']
+exp_data = df_verification[df_verification['group'] == 'Experimental']['adsorption_efficiency_%']
+
+# 2. 执行 t-检验
+t_statistic, p_value = stats.ttest_ind(control_data, exp_data, equal_var=False)
+
+# 3. 结果判断
+is_significant = p_value < 0.05 
+# 绘制柱状图，并在显著差异的柱子上添加 '***' 标记
+```
+
+##### B. 敏感性分析 (Sobol 或 OAT 简化)
+
+通过微小扰动核心参数（如 $\mu_0$ 和 $MIC$），观察模型输出（如最大 OD 值）的变化，评估模型对参数输入的依赖程度。此脚本采用**单参数扰动法 (OAT 简化)**。
+
+**敏感性分析核心代码**
+
+```python
+# 1. 加载二级模型参数
+params = load_data('module_3.2_secondary_model_parameters.csv', folder='results').iloc[0]
+mu0_nominal = params['mu0_h-1']
+mic_nominal = params['MIC_mg_L']
+
+# 2. 扰动参数 (±10%)
+perturbation = 0.1
+mu0_high = mu0_nominal * (1 + perturbation)
+mu0_low = mu0_nominal * (1 - perturbation)
+
+# 3. 预测并计算差异
+# sensitivity_mu0 = (Output(mu0_high) - Output(mu0_low)) / (mu0_high - mu0_low)
+# 绘制曲线族图 (figures/07_module_3.4_sensitivity_mu0.png)
+```
+
+#### 输入与输出
+
+**输入**:
+
+  - `data/raw/module_3.4_verification.csv` (验证实验结果)
+  - `results/module_3.2_secondary_model_parameters.csv` (二级模型参数，用于敏感性分析)
+
+**输出**:
+
+```
+figures/
+├── 06_module_3.4_verification_ttest.png       # 验证实验（tasA-smtA vs 对照）统计柱状图
+├── 07_module_3.4_sensitivity_mu0.png          # μ₀ 敏感性曲线图
+└── 08_module_3.4_sensitivity_MIC.png          # MIC 敏感性曲线图
+
+results/
+├── module_3.4_verification_summary.csv        # 统计检验结果 (t-stat, p-value, 结论)
+├── module_3.4_sensitivity_analysis.csv        # 敏感性指标 (对 μ₀, MIC, n 的影响度)
+└── module_3.4_final_report.txt                # 项目总报告 (汇总 3.1, 3.2, 3.4 结果)
+```
+
+### 5\. `code/utils.py` - 通用工具函数库
+
+**文件类型**: 工具函数库 (Python)  
+**行数**: \~150行  
+**依赖**: NumPy, Pandas, Matplotlib, SciPy, Scikit-learn
+
+#### 功能概述
+
+这是一个可重用的工具箱，包含项目所有脚本都会用到的通用函数，确保核心建模脚本 (`01` 到 `04`) 的简洁性和可维护性。
+
+#### 核心函数
+
+| 函数名 | 功能描述 | 核心算法 / 依赖 |
+| :--- | :--- | :--- |
+| `load_data(filename, folder)` | 安全地从指定文件夹加载 CSV 文件。 | `os.path.join`, `pd.read_csv` |
+| `save_results(df, filename)` | 保存 Pandas DataFrame 到 `results/` 文件夹。 | `df.to_csv` |
+| `save_figure(fig, filename)` | 保存 Matplotlib 图表到 `figures/` 文件夹。 | `fig.savefig` |
+| `calculate_statistics(data)` | 计算描述性统计量（均值、标准差、变异系数）。 | `np.mean`, `np.std`, `scipy.stats` |
+| `calculate_model_metrics(y_true, y_pred)` | **模型评估函数**，计算拟合优度指标。 | `r2_score`, `mean_squared_error` |
+| `perform_ttest(data1, data2)` | 执行双样本 t-检验，用于比较两组数据的差异。 | `scipy.stats.ttest_ind` |
+| `print_section/print_subsection` | 格式化控制台输出，增强可读性。 | Python `print` |
+
+**模型评估指标 ($\text{R}^2$) 代码**
+
+```python
+def calculate_model_metrics(y_true, y_pred, model_name='Model'):
+    r"""
+    计算模型评估指标 R², RMSE, MAE
+    
+    R² (R-squared): $$ R^2 = 1 - \frac{\sum (y_i - \hat{y}_i)^2}{\sum (y_i - \bar{y})^2} $$
+    """
+    R2 = r2_score(y_true, y_pred)
+    RMSE = mean_squared_error(y_true, y_pred, squared=False)
+    MAE = mean_absolute_error(y_true, y_pred)
+    
+    # ... (返回字典)
+```
+
+### 6\. `README.md` - 项目概览
+
+**文件类型**: Markdown (项目主页)  
+**功能概述**: 提供项目的**高层概览**，包括项目背景、团队分工、模块结构、文件结构和快速启动指南。这是项目公开展示的首要文档。
+
+#### 核心内容
+
+  - **项目名称**: TasAnchor项目 - 功能测试模块建模 (2025 iGEM SCU-China 复现)
+  - **团队分工**: 明确 A, B (本项目), C 组的任务范围。
+  - **模块结构**: 简要介绍模块 3.1 到 3.4 的生物学目标。
+  - **快速启动**: 提供一行命令运行数据提取和模型的指南。
+
+### 7\. `WORKFLOW.md` - 工作流程指南
+
+**文件类型**: Markdown (操作指南)  
+**功能概述**: 详细的**操作手册**，指导用户或新成员从环境设置到最终结果生成的完整步骤。
+
+#### 核心内容
+
+  - **环境准备**: 如何安装 `requirements.txt` 中的依赖。
+  - **运行步骤**: 强调必须按照 `01` -\> `02` -\> `03` -\> `04` 的顺序运行脚本。
+  - **数据更新流程**: 如果 iGEM Wiki 数据更新，如何仅修改 `01_data_extraction.py`。
+  - **常见问题排查**: 针对 `ModuleNotFoundError`, `curve_fit` 失败等常见问题提供解决方案。
+
+### 8\. `requirements.txt` - 依赖清单
+
+**文件类型**: 纯文本文件  
+**功能概述**: 列出运行所有 Python 脚本所需的全部第三方库及其最低版本。用于环境重现。
+
+#### 核心依赖
+
+```
+numpy>=1.21.0
+pandas>=1.3.0
+matplotlib>=3.4.0
+scipy>=1.7.0
+scikit-learn>=1.0.0
+# ... (其他可选依赖如 jupyter, seaborn)
+```
+
+-----
+
 ---
 
-由于篇幅限制，我继续在下一条消息中完成剩余文件的详细说明（03_module_3.2.py, 04_module_3.3_3.4.py, Jupyter Notebooks），以及数据更新流程和Jupyter使用方法的详细解答。
+## 8. 💻 notebooks/ (Jupyter Notebooks - 交互式分析)
 
-**你需要的修复补丁已经在第一个artifact中给出**，请按照说明修改这两个文件即可解决报错问题！
+Notebooks 文件夹用于快速验证模型、调整初始参数 $p0$ 和进行交互式数据探索 (EDA)。所有核心逻辑最终由 `code/` 文件夹中的 Python 脚本运行。
 
+| 文件名 | 对应脚本 | 功能描述 | 关键用途 |
+| :--- | :--- | :--- | :--- |
+| `01_Data_Exploration.ipynb` | `01_data_extraction.py` | 交互式加载、清洗并可视化原始生长、荧光和吸附数据，进行初步的数据趋势和质量检查。 | 确认数据质量，确定初步 $p0$ 范围。 |
+| `02_Primary_Model_Fitting.ipynb` | `02_module_3.1.py` | 集中测试 Modified Gompertz 和 Hill 方程的拟合效果。用于参数精调和 $R^2$ 验证。 | 快速生成拟合图，确定最优 Gompertz 和 Hill 参数。 |
+| `03_Secondary_Model.ipynb` | `03_module_3.2.py` | 专注于 Langmuir/Freundlich 等温线和二级生长抑制模型的拟合，用于模型选择。 | 确定 $q_{max}$ 和 $MIC$ 参数的精确值。 |
+| `04_Sensitivity_Analysis.ipynb` | `04_module_3.3_3.4.py` | 交互式地运行参数扰动分析，并计算实际应用所需的菌体干重，验证模型的鲁棒性。 | 敏感性曲线，实际应用场景所需生物量（g/L）。 |
+
+---
+
+## 9. 📊 生成的输出文件 (figures/, results/)
+
+运行所有脚本 (`01_` 至 `04_`) 后，项目会生成以下图表和结果数据文件。
+
+### 🖼️ figures/ (图表文件)
+
+| 文件名 | 来源脚本 | 描述 |
+| :--- | :--- | :--- |
+| `00_data_overview.png` | `01_data_extraction.py` | 原始数据的总览，例如生物膜形成的OD570柱状图。 |
+| `01_module_3.1_growth_fit.png` | `02_module_3.1.py` | Modified Gompertz 模型拟合曲线，对比不同 $Cd^{2+}$ 浓度。 |
+| `02_module_3.1_hill_fit.png` | `02_module_3.1.py` | Hill 方程拟合曲线，展示荧光响应的剂量-效应关系。 |
+| `03_module_3.2_adsorption_isotherm.png` | `03_module_3.2.py` | Langmuir/Freundlich 模型拟合对比图，显示最优拟合曲线。 |
+| `04_module_3.2_adsorption_cycles.png` | `03_module_3.2.py` | 菌株在多次吸附-解吸循环中的性能图。 |
+| `05_module_3.2_secondary_growth_model.png` | `03_module_3.2.py` | $\mu_{max}$ vs $Cd^{2+}$ 浓度（二级抑制模型）拟合曲线。 |
+| `06_module_3.4_verification_ttest.png` | `04_module_3.3_3.4.py` | 模块 3.4 验证实验结果，柱状图及显著性标记。 |
+| `07_module_3.4_sensitivity_mu0.png` | `04_module_3.3_3.4.py` | $\mu_0$ 扰动下的模型敏感性分析图。 |
+| `08_module_3.4_sensitivity_MIC.png` | `04_module_3.3_3.4.py` | $MIC$ 扰动下的模型敏感性分析图。 |
+
+### 📝 results/ (建模结果文件)
+
+| 文件名 | 来源脚本 | 描述 |
+| :--- | :--- | :--- |
+| `data_extraction_report.txt` | `01_data_extraction.py` | 原始数据提取的统计摘要和文件校验信息。 |
+| `module_3.1_gompertz_parameters.csv` | `02_module_3.1.py` | 所有 Modified Gompertz 模型的拟合参数 ($\mu_{max}, \lambda, A$ 等) 及 $R^2$。|
+| `module_3.1_hill_parameters.csv` | `02_module_3.1.py` | Hill 方程的关键参数 ($EC_{50}, F_{max}, n$) 及 $R^2$。 |
+| `module_3.2_isotherm_parameters.csv` | `03_module_3.2.py` | Langmuir 和 Freundlich 模型的拟合参数 ($q_{max}, K_L, K_F, 1/n$)。 |
+| `module_3.2_secondary_model_parameters.csv` | `03_module_3.2.py` | 二级生长抑制模型的 $\mu_0, MIC, n$ 参数。 |
+| `module_3.4_verification_summary.csv` | `04_module_3.3_3.4.py` | 模块 3.4 $t$-检验结果、吸附效率平均值和标准差。 |
+| `module_3.4_application_scenarios.csv` | `04_module_3.3_3.4.py` | 基于 $q_{max}$，预测不同废水体积和浓度下所需的菌体干重。 |
+| `final_summary_report.txt` | `04_module_3.3_3.4.py` | **项目最终总结报告**，整合 3.1-3.4 的关键结果、结论和应用建议。|
