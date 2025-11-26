@@ -39,13 +39,16 @@ df_growth = load_data('module_3.1_growth_curves.csv')
 
 # Modified Gompertz模型
 def gompertz_model(t, A, mu_max, lag):
-    """
+    r"""
     Modified Gompertz模型
-    
+
+    数学公式:
+    $$ OD(t) = A \cdot \exp\left(-\exp\left(\frac{\mu_{\max} \cdot e}{A} (\lambda - t) + 1\right)\right) $$
+
     参数解释：
-    - A: 最大OD值（菌株能达到的最高细胞密度）
-    - mu_max: 最大比生长速率 (h⁻¹)，越大生长越快
-    - lag: 滞后期 (h)，菌株适应环境所需时间
+    - $A$: 最大OD值（菌株能达到的最高细胞密度）
+    - $\mu_{\max}$ (mu_max): 最大比生长速率 (h⁻¹)
+    - $\lambda$ (lag): 滞后期 (h)，菌株适应环境所需时间
     """
     return A * np.exp(-np.exp(mu_max * np.e / A * (lag - t) + 1))
 
@@ -145,7 +148,19 @@ df_fluo = load_data('module_3.1_fluorescence.csv')
 
 # 简化的Hill方程（三参数，去掉F_min）
 def hill_equation_simple(x, F_max, EC50, n):
-    """简化Hill方程（假设F_min=0）"""
+    r"""
+    简化Hill方程（假设F_min=0）
+
+    数学公式:
+    $$ F(x) = \frac{F_{\max} \cdot x^n}{EC_{50}^n + x^n} $$
+
+    参数解释:
+    - $F(x)$: 荧光强度
+    - $F_{\max}$: 最大荧光强度
+    - $EC_{50}$: 半数有效浓度
+    - $n$: Hill系数
+    - $x$: 浓度
+    """
     return F_max * x**n / (EC50**n + x**n)
 
 # 拟合Hill方程

@@ -54,9 +54,21 @@ except FileNotFoundError as e:
 # 计算吸附量 q_e (mg/g)
 # 假设使用 1g 干重菌体处理 1L溶液
 def calculate_qe(C0, removal_percent, V=1.0, m=1.0):
-    """
+    r"""
     从去除率计算吸附量
-    q_e = (C0 * removal_% / 100) * V / m
+
+    中间变量:
+    $C_e = C_0 \cdot (1 - \frac{\text{removal_percent}}{100})$
+
+    核心公式:
+    $$ q_e = \frac{(C_0 - C_e) \cdot V}{m} $$
+
+    参数:
+    - $q_e$: 吸附量 (mg/g)
+    - $C_0$: 初始浓度 (mg/L)
+    - $C_e$: 平衡浓度 (mg/L)
+    - $V$: 溶液体积 (L)
+    - $m$: 菌体干重 (g)
     """
     Ce = C0 * (1 - removal_percent / 100)
     return (C0 - Ce) * V / m
@@ -103,26 +115,38 @@ for ce, qe in zip(Ce_values, qe_values):
 
 # Langmuir模型
 def langmuir_model(Ce, q_max, K_L):
-    """
+    r"""
     Langmuir等温吸附模型
-    
+
+    数学公式:
+    $$ q_e = \frac{q_{\max} \cdot K_L \cdot C_e}{1 + K_L \cdot C_e} $$
+
     参数：
-    - q_max: 最大吸附容量 (mg/g)
-    - K_L: Langmuir常数 (L/mg)，越大吸附亲和力越强
-    
+    - $q_e$: 平衡吸附量 (mg/g)
+    - $C_e$: 平衡浓度 (mg/L)
+    - $q_{\max}$: 最大吸附容量 (mg/g)
+    - $K_L$: Langmuir常数 (L/mg)
+
     假设：单层吸附，吸附位点均匀
     """
     return q_max * K_L * Ce / (1 + K_L * Ce)
 
+
+
 # Freundlich模型
 def freundlich_model(Ce, K_F, n):
-    """
+    r"""
     Freundlich等温吸附模型
-    
+
+    数学公式:
+    $$ q_e = K_F \cdot C_e^{1/n} $$
+
     参数：
-    - K_F: Freundlich常数
-    - 1/n: 吸附强度指数（0.1-1表示易吸附）
-    
+    - $q_e$: 平衡吸附量 (mg/g)
+    - $C_e$: 平衡浓度 (mg/L)
+    - $K_F$: Freundlich常数
+    - $1/n$: 吸附强度指数
+
     假设：多层吸附，表面不均匀
     """
     return K_F * Ce**(1/n)
@@ -309,15 +333,18 @@ mu_max_values = df_gompertz['mu_max_h-1'].values
 
 # 二级模型：幂函数抑制
 def secondary_growth_model(Cd, mu0, MIC, n):
-    """
-    二级生长模型
-    
-    μ_max(Cd) = μ₀ × [1 - (Cd/MIC)^n]
-    
+    r"""
+    二级生长模型 (Power Law Inhibition)
+
+    数学公式:
+    $$ \mu_{\max}(Cd) = \mu_0 \cdot \left[1 - \left(\frac{Cd}{MIC}\right)^n\right] $$
+
     参数：
-    - μ₀: 无Cd²⁺时的最大生长速率
-    - MIC: 最小抑制浓度 (mg/L)
-    - n: 抑制指数
+    - $\mu_{\max}(Cd)$: 特定Cd浓度下的最大生长速率
+    - $\mu_0$: 无Cd²⁺时的最大生长速率 (h⁻¹)
+    - $Cd$: 镉离子浓度 (mg/L)
+    - $MIC$: 最小抑制浓度 (mg/L)
+    - $n$: 抑制指数
     """
     # 添加边界检查
     ratio = Cd / MIC

@@ -112,22 +112,23 @@ def calculate_statistics(data):
 
 
 def calculate_model_metrics(y_true, y_pred, model_name='Model'):
-    """
+    r"""
     计算模型评估指标
-    
+
+    包含:
+    - R² (R-squared): $ R^2 = 1 - \frac{\sum (y_i - \hat{y}_i)^2}{\sum (y_i - \bar{y})^2} $
+    - RMSE (Root Mean Squared Error): $ \text{RMSE} = \sqrt{\frac{1}{n} \sum (y_i - \hat{y}_i)^2} $
+    - MAE (Mean Absolute Error): $ \text{MAE} = \frac{1}{n} \sum |y_i - \hat{y}_i| $
+
     Parameters:
     -----------
     y_true : array-like
-        真实值
+        真实值 ($y_i$)
     y_pred : array-like
-        预测值
+        预测值 ($\hat{y}_i$)
     model_name : str
         模型名称
-    
-    Returns:
-    --------
-    metrics : dict
-        评估指标字典
+    ...
     """
     y_true = np.array(y_true)
     y_pred = np.array(y_pred)
