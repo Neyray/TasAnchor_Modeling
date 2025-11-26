@@ -660,9 +660,7 @@ R2: 0.9876
 
 -----
 
-## 📁 文件功能详细说明 (续)
-
-### 3\. `code/03_module_3.2.py` - 吸附模块建模
+### 4\. `code/03_module_3.2.py` - 吸附模块建模
 
 **文件类型**: 核心建模脚本 (Python)  
 **行数**: \~380行  
@@ -749,7 +747,7 @@ results/
 └── module_3.2_report.txt                      # 文本总结报告
 ```
 
-### 4\. `code/04_module_3.3_3.4.py` - 综合分析与验证
+### 5\. `code/04_module_3.3_3.4.py` - 综合分析与验证
 
 **文件类型**: 综合分析与验证脚本 (Python)  
 **行数**: \~300行  
@@ -830,43 +828,7 @@ results/
 └── module_3.4_final_report.txt                # 项目总报告 (汇总 3.1, 3.2, 3.4 结果)
 ```
 
-### 5\. `code/utils.py` - 通用工具函数库
 
-**文件类型**: 工具函数库 (Python)  
-**行数**: \~150行  
-**依赖**: NumPy, Pandas, Matplotlib, SciPy, Scikit-learn
-
-#### 功能概述
-
-这是一个可重用的工具箱，包含项目所有脚本都会用到的通用函数，确保核心建模脚本 (`01` 到 `04`) 的简洁性和可维护性。
-
-#### 核心函数
-
-| 函数名 | 功能描述 | 核心算法 / 依赖 |
-| :--- | :--- | :--- |
-| `load_data(filename, folder)` | 安全地从指定文件夹加载 CSV 文件。 | `os.path.join`, `pd.read_csv` |
-| `save_results(df, filename)` | 保存 Pandas DataFrame 到 `results/` 文件夹。 | `df.to_csv` |
-| `save_figure(fig, filename)` | 保存 Matplotlib 图表到 `figures/` 文件夹。 | `fig.savefig` |
-| `calculate_statistics(data)` | 计算描述性统计量（均值、标准差、变异系数）。 | `np.mean`, `np.std`, `scipy.stats` |
-| `calculate_model_metrics(y_true, y_pred)` | **模型评估函数**，计算拟合优度指标。 | `r2_score`, `mean_squared_error` |
-| `perform_ttest(data1, data2)` | 执行双样本 t-检验，用于比较两组数据的差异。 | `scipy.stats.ttest_ind` |
-| `print_section/print_subsection` | 格式化控制台输出，增强可读性。 | Python `print` |
-
-**模型评估指标 ($\text{R}^2$) 代码**
-
-```python
-def calculate_model_metrics(y_true, y_pred, model_name='Model'):
-    r"""
-    计算模型评估指标 R², RMSE, MAE
-    
-    R² (R-squared): $$ R^2 = 1 - \frac{\sum (y_i - \hat{y}_i)^2}{\sum (y_i - \bar{y})^2} $$
-    """
-    R2 = r2_score(y_true, y_pred)
-    RMSE = mean_squared_error(y_true, y_pred, squared=False)
-    MAE = mean_absolute_error(y_true, y_pred)
-    
-    # ... (返回字典)
-```
 
 ### 6\. `README.md` - 项目概览
 
