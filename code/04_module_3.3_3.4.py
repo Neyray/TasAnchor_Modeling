@@ -17,7 +17,8 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 # 确保 utils 中包含 load_data, save_figure, print_section, perform_ttest 等函数
-from utils import * import numpy as np
+from utils import * 
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
