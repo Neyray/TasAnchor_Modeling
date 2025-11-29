@@ -467,8 +467,8 @@ with open(report_path, 'w', encoding='utf-8') as f:
     f.write("七、生成的图表和数据文件\n")
     f.write("-" * 70 + "\n")
     f.write("图表 (figures/):\n")
-    # ****** 修正图表计数到 9 个 ******
-    for i in range(1, 10):
+    # ****** 修正图表计数到 10 个 ******
+    for i in range(10):
         f.write(f"  {i:02d}_*.png\n")
     f.write("\n数据文件 (results/):\n")
     f.write("  - module_3.1_gompertz_parameters.csv\n")

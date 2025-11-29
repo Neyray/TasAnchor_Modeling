@@ -76,33 +76,19 @@ def calculate_qe(C0, removal_percent, V=1.0, m=1.0):
 # 提取吸附步骤的平衡数据（使用pht01组，因为它是工程菌株）
 print("\n[2] 计算平衡吸附量...")
 
-# 从9 mg/L组提取（假设第1个cycle是吸附平衡点）
+# 只使用9 mg/L的数据（数据质量更好）
 cycle_9mg = df_9mg_pht01['cycle'].values
 removal_9mg = df_9mg_pht01['removal_%'].values
 
-# 从5 mg/L组提取
-cycle_5mg = df_5mg_pht01['cycle'].values
-removal_5mg = df_5mg_pht01['removal_%'].values
-
-# 计算平衡浓度和吸附量
 Ce_values = []
 qe_values = []
 
-# 9 mg/L的数据点
+# 9 mg/L的数据点（只取吸附步骤，即奇数cycle）
 for i in range(0, len(cycle_9mg), 2):  # 每2个点一组（吸附+解吸）
     if i < len(cycle_9mg):
         removal = removal_9mg[i]
         Ce = 9.0 * (1 - removal / 100)
         qe = calculate_qe(9.0, removal)
-        Ce_values.append(Ce)
-        qe_values.append(qe)
-
-# 5 mg/L的数据点
-for i in range(0, len(cycle_5mg), 2):
-    if i < len(cycle_5mg):
-        removal = removal_5mg[i]
-        Ce = 5.0 * (1 - removal / 100)
-        qe = calculate_qe(5.0, removal)
         Ce_values.append(Ce)
         qe_values.append(qe)
 
@@ -154,8 +140,9 @@ def freundlich_model(Ce, K_F, n):
 # 拟合Langmuir
 print("\n[3] 拟合Langmuir模型...")
 try:
-    p0_lang = [10, 1]
-    popt_lang, _ = curve_fit(langmuir_model, Ce_values, qe_values, p0=p0_lang, maxfev=10000)
+    p0_lang = [3.0, 0.5]  # 改为更合理的初始值
+    bounds = ([1.0, 0.01], [10.0, 5.0])  # 添加边界约束
+    popt_lang, _ = curve_fit(langmuir_model, Ce_values, qe_values, p0=p0_lang, bounds=bounds, maxfev=10000)
     qe_pred_lang = langmuir_model(Ce_values, *popt_lang)
     metrics_lang = calculate_model_metrics(qe_values, qe_pred_lang, 'Langmuir')
     
