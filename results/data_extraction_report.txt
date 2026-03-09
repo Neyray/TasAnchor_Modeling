@@ -1,6 +1,6 @@
 TasAnchor B 组 - 数据提取报告
-日期: 2025-11-29 19:46:51
-项目目录: D:\BaiduSyncdisk\大学学习文件\iGEM\iGEM二面\TasAnchor_Modeling
+日期: 2026-02-13 23:31:20
+项目目录: D:\BaiduSyncdisk\大学学习文件\iGEM\iGEM面试\iGEM二面\TasAnchor_Modeling
 
 数据文件列表:
 ----------------------------------------------------------------------
